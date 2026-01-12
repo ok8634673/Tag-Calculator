@@ -1,0 +1,975 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>标签数量统计器 - 增强版</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            color: #333;
+            line-height: 1.6;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+        }
+        
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+            font-size: 2.2rem;
+        }
+        
+        .subtitle {
+            color: #7f8c8d;
+            font-size: 1.1rem;
+        }
+        
+        .clipboard-notice {
+            background: #e3f2fd;
+            border-left: 4px solid #2196f3;
+            padding: 12px 15px;
+            margin-top: 15px;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .clipboard-notice i {
+            color: #2196f3;
+        }
+        
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+            margin-bottom: 25px;
+        }
+        
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .panel {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+        }
+        
+        .panel h2 {
+            color: #3498db;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #f0f0f0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .panel h2 i {
+            color: #3498db;
+        }
+        
+        .input-section {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+        
+        textarea {
+            width: 100%;
+            height: 350px;
+            padding: 18px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 15px;
+            resize: vertical;
+            transition: border-color 0.3s;
+            font-family: 'Consolas', 'Monaco', monospace;
+            line-height: 1.5;
+        }
+        
+        textarea:focus {
+            outline: none;
+            border-color: #3498db;
+        }
+        
+        .controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-top: 20px;
+            align-items: center;
+        }
+        
+        .control-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: #f8f9fa;
+            padding: 10px 15px;
+            border-radius: 8px;
+        }
+        
+        label {
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        input[type="number"] {
+            width: 80px;
+            padding: 10px;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            text-align: center;
+            font-weight: 600;
+            font-size: 16px;
+        }
+        
+        input[type="number"]:focus {
+            outline: none;
+            border-color: #3498db;
+        }
+        
+        .buttons {
+            display: flex;
+            gap: 10px;
+            margin-left: auto;
+            flex-wrap: wrap;
+        }
+        
+        button {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .btn-primary {
+            background: #3498db;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #2980b9;
+            transform: translateY(-2px);
+        }
+        
+        .btn-secondary {
+            background: #95a5a6;
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background: #7f8c8d;
+            transform: translateY(-2px);
+        }
+        
+        .btn-success {
+            background: #2ecc71;
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background: #27ae60;
+            transform: translateY(-2px);
+        }
+        
+        .btn-warning {
+            background: #f39c12;
+            color: white;
+        }
+        
+        .btn-warning:hover {
+            background: #d68910;
+            transform: translateY(-2px);
+        }
+        
+        .btn-warning:disabled {
+            background: #bdc3c7;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .results-section {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+        
+        .stats {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        
+        .stat-box {
+            flex: 1;
+            min-width: 150px;
+            background: #f8f9fa;
+            padding: 18px;
+            border-radius: 8px;
+            text-align: center;
+            border-left: 4px solid #3498db;
+        }
+        
+        .stat-label {
+            font-size: 14px;
+            color: #7f8c8d;
+            margin-bottom: 5px;
+        }
+        
+        .stat-value {
+            font-size: 28px;
+            font-weight: 700;
+            color: #2c3e50;
+        }
+        
+        .stat-value.exceeded {
+            color: #e74c3c;
+        }
+        
+        .tags-container {
+            flex: 1;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 18px;
+            overflow-y: auto;
+            max-height: 350px;
+            background: #fcfcfc;
+            font-family: 'Consolas', 'Monaco', monospace;
+            position: relative;
+            min-height: 200px;
+        }
+        
+        .tag {
+            display: inline-block;
+            padding: 8px 12px;
+            margin: 0 8px 8px 0;
+            background: #ecf0f1;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: all 0.2s;
+            border: 1px solid #d5dbdb;
+            cursor: pointer;
+            position: relative;
+            user-select: none;
+        }
+        
+        .tag:hover {
+            background: #d5dbdb;
+            transform: translateY(-2px);
+            box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+        }
+        
+        .tag:hover::after {
+            content: "点击删除";
+            position: absolute;
+            top: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #2c3e50;
+            color: white;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            white-space: nowrap;
+            z-index: 10;
+        }
+        
+        .tag.exceeded {
+            background: #ffebee;
+            color: #c62828;
+            border-color: #ffcdd2;
+            font-weight: 600;
+        }
+        
+        .tag.exceeded:hover {
+            background: #ffcdd2;
+        }
+        
+        .tag.deleting {
+            animation: fadeOut 0.3s forwards;
+        }
+        
+        @keyframes fadeOut {
+            from { opacity: 1; transform: scale(1); }
+            to { opacity: 0; transform: scale(0.8); }
+        }
+        
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(231, 76, 60, 0.4); }
+            70% { box-shadow: 0 0 0 5px rgba(231, 76, 60, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(231, 76, 60, 0); }
+        }
+        
+        .legend {
+            display: flex;
+            gap: 20px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+        }
+        
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+        }
+        
+        .normal-color {
+            background: #ecf0f1;
+        }
+        
+        .exceeded-color {
+            background: #ffebee;
+        }
+        
+        .non-tag-text {
+            color: #95a5a6;
+            font-style: italic;
+            padding: 4px 8px;
+            background: #f9f9f9;
+            border-radius: 4px;
+            margin: 0 5px 5px 0;
+            display: inline-block;
+        }
+        
+        .non-tag-section {
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px dashed #ddd;
+        }
+        
+        .non-tag-section h4 {
+            color: #7f8c8d;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+        
+        .results-controls {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 15px;
+            gap: 10px;
+        }
+        
+        .undo-info {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 13px;
+            color: #7f8c8d;
+            background: #f8f9fa;
+            padding: 8px 12px;
+            border-radius: 6px;
+        }
+        
+        .undo-count {
+            font-weight: bold;
+            color: #3498db;
+        }
+        
+        .instructions {
+            background: #fff8e1;
+            border-left: 4px solid #ffc107;
+            padding: 20px;
+            margin-top: 25px;
+            border-radius: 8px;
+        }
+        
+        .instructions h3 {
+            color: #ff9800;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .instructions ul {
+            padding-left: 20px;
+        }
+        
+        .instructions li {
+            margin-bottom: 8px;
+        }
+        
+        .alert {
+            padding: 12px 15px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .alert-success {
+            background: #e8f5e9;
+            color: #2e7d32;
+            border-left: 4px solid #4caf50;
+        }
+        
+        .alert-warning {
+            background: #fff3e0;
+            color: #ef6c00;
+            border-left: 4px solid #ff9800;
+        }
+        
+        .alert-error {
+            background: #ffebee;
+            color: #c62828;
+            border-left: 4px solid #f44336;
+        }
+        
+        .alert-info {
+            background: #e3f2fd;
+            color: #1565c0;
+            border-left: 4px solid #2196f3;
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 20px;
+            color: #7f8c8d;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-hashtag"></i> 标签数量统计器 - 增强版</h1>
+            <p class="subtitle">支持标签删除与撤回功能 | 只统计以 # 开头的标签，忽略普通文本</p>
+            <div class="clipboard-notice">
+                <i class="fas fa-clipboard-check"></i>
+                <span>本页面支持自动读取剪切板功能。当您打开页面时，我们会尝试读取剪切板中的内容。</span>
+            </div>
+        </header>
+        
+        <div class="main-content">
+            <div class="panel input-section">
+                <h2><i class="fas fa-edit"></i> 输入内容</h2>
+                
+                <div id="clipboardAlerts"></div>
+                
+                <textarea id="tagInput" placeholder="请输入或粘贴您的内容，系统将自动识别以 # 开头的标签并统计。
+
+您也可以点击右侧的「读取剪切板」按钮，或等待页面自动读取剪切板内容。
+
+示例内容：
+瑶瑶の依赖摇
+Yaoyao's Yi Lai Yao Dance
+#原神
+#原神空月之歌 #原神版本前瞻
+#瑶瑶 #依赖摇
+#genshinimpact #原神混剪
+
+说明：只有以 # 开头的字符串会被统计为标签。"></textarea>
+                
+                <div class="controls">
+                    <div class="control-group">
+                        <label for="limitInput"><i class="fas fa-sliders-h"></i> 标签限制：</label>
+                        <input type="number" id="limitInput" min="1" max="200" value="50">
+                    </div>
+                    
+                    <div class="buttons">
+                        <button id="pasteBtn" class="btn-success">
+                            <i class="fas fa-clipboard"></i> 读取剪切板
+                        </button>
+                        <button id="countBtn" class="btn-primary">
+                            <i class="fas fa-calculator"></i> 统计标签
+                        </button>
+                        <button id="clearBtn" class="btn-secondary">
+                            <i class="fas fa-broom"></i> 清空
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="panel results-section">
+                <h2><i class="fas fa-chart-bar"></i> 统计结果</h2>
+                
+                <div class="results-controls">
+                    <div class="undo-info">
+                        <i class="fas fa-history"></i>
+                        <span>可撤回: <span id="undoCount" class="undo-count">0</span> 步</span>
+                    </div>
+                    <button id="undoBtn" class="btn-warning" disabled>
+                        <i class="fas fa-undo"></i> 撤回删除
+                    </button>
+                </div>
+                
+                <div class="stats">
+                    <div class="stat-box">
+                        <div class="stat-label">标签总数</div>
+                        <div id="totalTags" class="stat-value">0</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-label">设置限制</div>
+                        <div id="limitDisplay" class="stat-value">50</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-label">超出数量</div>
+                        <div id="exceededCount" class="stat-value">0</div>
+                    </div>
+                </div>
+                
+                <div class="tags-container" id="tagsContainer">
+                    <p style="color: #95a5a6; text-align: center; margin-top: 50px;">统计结果将在这里显示</p>
+                </div>
+                
+                <div class="legend">
+                    <div class="legend-item">
+                        <div class="legend-color normal-color"></div>
+                        <span>正常标签（在限制内）</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color exceeded-color"></div>
+                        <span>超出限制的标签</span>
+                    </div>
+                    <div class="legend-item">
+                        <i class="fas fa-mouse-pointer" style="color: #3498db;"></i>
+                        <span>点击标签可删除</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="instructions">
+            <h3><i class="fas fa-info-circle"></i> 使用说明</h3>
+            <ul>
+                <li><strong>自动读取剪切板</strong>：打开页面时，系统会自动尝试读取剪切板内容（需要浏览器权限）</li>
+                <li><strong>手动读取剪切板</strong>：点击「读取剪切板」按钮手动获取剪切板内容</li>
+                <li><strong>标签删除功能</strong>：点击右侧统计区域的任意标签即可删除该标签</li>
+                <li><strong>撤回删除功能</strong>：点击「撤回删除」按钮可以恢复最近一次删除的标签（最多可撤回10步）</li>
+                <li>系统只会统计以 <strong>#</strong> 开头的字符串作为标签，忽略所有普通文本</li>
+                <li>在"标签限制"框中设置您希望的限制数量（默认50）</li>
+                <li>点击"统计标签"按钮，系统将自动识别标签并高亮显示超出限制的部分</li>
+                <li>超出限制的标签会以红色背景高亮显示</li>
+                <li>统计结果区域会显示标签总数、设置限制和超出数量的统计信息</li>
+                <li>点击"清空"按钮可以重置输入框和统计结果</li>
+            </ul>
+        </div>
+        
+        <footer>
+            <p>标签数量统计器 - 增强版 &copy; 2023 | 支持标签删除与撤回功能</p>
+        </footer>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const tagInput = document.getElementById('tagInput');
+            const limitInput = document.getElementById('limitInput');
+            const pasteBtn = document.getElementById('pasteBtn');
+            const countBtn = document.getElementById('countBtn');
+            const clearBtn = document.getElementById('clearBtn');
+            const undoBtn = document.getElementById('undoBtn');
+            const undoCount = document.getElementById('undoCount');
+            const totalTagsElement = document.getElementById('totalTags');
+            const limitDisplay = document.getElementById('limitDisplay');
+            const exceededCountElement = document.getElementById('exceededCount');
+            const tagsContainer = document.getElementById('tagsContainer');
+            const clipboardAlerts = document.getElementById('clipboardAlerts');
+            
+            // 全局变量
+            let tagsHistory = []; // 标签历史记录（用于撤回功能）
+            let historyIndex = -1; // 当前历史记录索引
+            const MAX_HISTORY = 10; // 最多保存的历史记录步数
+            
+            // 初始化示例数据
+            limitDisplay.textContent = limitInput.value;
+            
+            // 显示提示信息
+            function showAlert(message, type = 'success') {
+                const alertDiv = document.createElement('div');
+                alertDiv.className = `alert alert-${type}`;
+                
+                let icon = 'fa-check-circle';
+                if (type === 'warning') icon = 'fa-exclamation-triangle';
+                if (type === 'error') icon = 'fa-times-circle';
+                if (type === 'info') icon = 'fa-info-circle';
+                
+                alertDiv.innerHTML = `
+                    <i class="fas ${icon}"></i>
+                    <span>${message}</span>
+                `;
+                
+                clipboardAlerts.appendChild(alertDiv);
+                
+                // 5秒后自动移除提示
+                setTimeout(() => {
+                    alertDiv.style.opacity = '0';
+                    alertDiv.style.transition = 'opacity 0.5s';
+                    setTimeout(() => {
+                        if (alertDiv.parentNode) {
+                            alertDiv.parentNode.removeChild(alertDiv);
+                        }
+                    }, 500);
+                }, 5000);
+            }
+            
+            // 保存当前标签状态到历史记录
+            function saveToHistory(tags, reason = '修改') {
+                // 如果当前不是最新状态，删除之后的所有历史记录
+                if (historyIndex < tagsHistory.length - 1) {
+                    tagsHistory = tagsHistory.slice(0, historyIndex + 1);
+                }
+                
+                // 添加新记录
+                tagsHistory.push([...tags]);
+                historyIndex++;
+                
+                // 限制历史记录数量
+                if (tagsHistory.length > MAX_HISTORY) {
+                    tagsHistory.shift();
+                    historyIndex--;
+                }
+                
+                // 更新撤回按钮状态
+                updateUndoButton();
+                
+                console.log(`已保存历史记录 (${reason}):`, tagsHistory.length, '步');
+            }
+            
+            // 更新撤回按钮状态
+            function updateUndoButton() {
+                const canUndo = historyIndex > 0;
+                undoBtn.disabled = !canUndo;
+                undoCount.textContent = historyIndex;
+                
+                if (canUndo) {
+                    undoBtn.title = `可撤回到前 ${historyIndex} 步`;
+                } else {
+                    undoBtn.title = '没有可撤回的操作';
+                }
+            }
+            
+            // 从剪切板读取内容的函数
+            async function readFromClipboard() {
+                try {
+                    // 检查浏览器是否支持剪切板API
+                    if (!navigator.clipboard) {
+                        showAlert('您的浏览器不支持剪切板API，请手动粘贴内容。', 'warning');
+                        return null;
+                    }
+                    
+                    // 请求读取剪切板权限并获取内容
+                    const text = await navigator.clipboard.readText();
+                    return text;
+                } catch (error) {
+                    console.error('读取剪切板失败:', error);
+                    
+                    // 根据错误类型提供不同的提示
+                    if (error.name === 'NotAllowedError') {
+                        showAlert('需要您授予剪切板访问权限。请点击页面任意位置后重试。', 'warning');
+                    } else if (error.name === 'DataError') {
+                        showAlert('剪切板数据无法读取，可能为空或格式不支持。', 'warning');
+                    } else {
+                        showAlert('读取剪切板失败，请手动粘贴内容。', 'error');
+                    }
+                    
+                    return null;
+                }
+            }
+            
+            // 自动读取剪切板（页面加载时）
+            async function autoReadClipboard() {
+                // 延迟1秒执行，让页面先完全加载
+                setTimeout(async () => {
+                    const clipboardText = await readFromClipboard();
+                    
+                    if (clipboardText && clipboardText.trim().length > 0) {
+                        // 检查输入框是否已经有内容
+                        if (!tagInput.value || tagInput.value.trim().length === 0) {
+                            tagInput.value = clipboardText;
+                            showAlert('已自动从剪切板读取内容！', 'success');
+                            countTags(); // 自动统计
+                        } else {
+                            showAlert('检测到剪切板有内容，但输入框已存在内容，未自动替换。', 'warning');
+                        }
+                    }
+                }, 1000);
+            }
+            
+            // 手动读取剪切板按钮事件
+            pasteBtn.addEventListener('click', async function() {
+                const clipboardText = await readFromClipboard();
+                
+                if (clipboardText && clipboardText.trim().length > 0) {
+                    tagInput.value = clipboardText;
+                    showAlert('剪切板内容已成功读取！', 'success');
+                    countTags(); // 自动统计
+                }
+            });
+            
+            // 统计标签函数 - 只统计以#开头的标签
+            function countTags(fromInput = true) {
+                const inputText = tagInput.value.trim();
+                const limit = parseInt(limitInput.value) || 50;
+                
+                // 更新限制显示
+                limitDisplay.textContent = limit;
+                
+                // 清空标签容器
+                tagsContainer.innerHTML = '';
+                
+                // 如果没有输入，显示提示
+                if (!inputText) {
+                    tagsContainer.innerHTML = '<p style="color: #95a5a6; text-align: center; margin-top: 50px;">请输入内容</p>';
+                    totalTagsElement.textContent = '0';
+                    exceededCountElement.textContent = '0';
+                    
+                    // 清空历史记录
+                    tagsHistory = [];
+                    historyIndex = -1;
+                    updateUndoButton();
+                    return;
+                }
+                
+                // 使用正则表达式匹配所有以#开头的标签
+                // 这个正则匹配以#开头，后跟一个或多个非空白字符的字符串
+                const tagRegex = /#[^\s#]+/g;
+                let tags = inputText.match(tagRegex) || [];
+                
+                // 如果是来自输入框的更新，保存到历史记录
+                if (fromInput) {
+                    saveToHistory(tags, '输入');
+                }
+                
+                // 统计总数
+                const totalTags = tags.length;
+                totalTagsElement.textContent = totalTags;
+                
+                // 计算超出数量
+                const exceededCount = Math.max(0, totalTags - limit);
+                exceededCountElement.textContent = exceededCount;
+                
+                // 根据是否超出限制添加样式类
+                if (exceededCount > 0) {
+                    exceededCountElement.classList.add('exceeded');
+                } else {
+                    exceededCountElement.classList.remove('exceeded');
+                }
+                
+                // 提取非标签文本（用于显示但不算入统计）
+                const nonTagText = inputText.replace(tagRegex, '').replace(/\s+/g, ' ').trim();
+                
+                // 显示所有标签
+                if (tags.length > 0) {
+                    tags.forEach((tag, index) => {
+                        const tagElement = document.createElement('span');
+                        tagElement.className = 'tag';
+                        tagElement.textContent = tag;
+                        tagElement.dataset.index = index;
+                        
+                        // 如果超过限制，添加超出样式
+                        if (index >= limit) {
+                            tagElement.classList.add('exceeded');
+                        }
+                        
+                        // 添加点击删除事件
+                        tagElement.addEventListener('click', function(e) {
+                            e.stopPropagation();
+                            deleteTag(index);
+                        });
+                        
+                        tagsContainer.appendChild(tagElement);
+                    });
+                } else {
+                    const noTagsMsg = document.createElement('p');
+                    noTagsMsg.style.cssText = 'color: #95a5a6; text-align: center; margin-top: 30px;';
+                    noTagsMsg.textContent = '未找到以 # 开头的标签';
+                    tagsContainer.appendChild(noTagsMsg);
+                }
+                
+                // 显示非标签文本（如果有）
+                if (nonTagText && nonTagText.length > 0) {
+                    const nonTagSection = document.createElement('div');
+                    nonTagSection.className = 'non-tag-section';
+                    
+                    const nonTagTitle = document.createElement('h4');
+                    nonTagTitle.textContent = '已忽略的非标签文本:';
+                    nonTagSection.appendChild(nonTagTitle);
+                    
+                    // 限制非标签文本显示长度
+                    const displayText = nonTagText.length > 200 ? 
+                        nonTagText.substring(0, 200) + '...' : nonTagText;
+                    
+                    const nonTagContent = document.createElement('div');
+                    nonTagContent.innerHTML = `<span class="non-tag-text">${displayText}</span>`;
+                    nonTagSection.appendChild(nonTagContent);
+                    
+                    tagsContainer.appendChild(nonTagSection);
+                }
+                
+                // 如果所有标签都在限制内，显示提示
+                if (exceededCount === 0 && totalTags > 0) {
+                    const message = document.createElement('p');
+                    message.style.cssText = 'color: #27ae60; text-align: center; margin-top: 20px; font-weight: 600;';
+                    message.textContent = `✅ 所有标签都在限制内（${totalTags}/${limit}）`;
+                    tagsContainer.appendChild(message);
+                }
+                
+                // 如果超出限制，显示警告
+                if (exceededCount > 0) {
+                    const warning = document.createElement('p');
+                    warning.style.cssText = 'color: #e74c3c; text-align: center; margin-top: 20px; font-weight: 600;';
+                    warning.textContent = `⚠️ 有 ${exceededCount} 个标签超出限制（${totalTags}/${limit}）`;
+                    tagsContainer.appendChild(warning);
+                }
+            }
+            
+            // 删除标签函数
+            function deleteTag(index) {
+                // 获取当前所有标签
+                const tagRegex = /#[^\s#]+/g;
+                const currentText = tagInput.value;
+                const tags = currentText.match(tagRegex) || [];
+                
+                if (index >= 0 && index < tags.length) {
+                    const deletedTag = tags[index];
+                    
+                    // 保存删除前的状态到历史记录
+                    saveToHistory(tags, '删除前');
+                    
+                    // 从数组中删除标签
+                    tags.splice(index, 1);
+                    
+                    // 更新输入框内容
+                    // 我们需要重建文本，保留非标签部分
+                    const nonTagText = currentText.replace(tagRegex, '').trim();
+                    const newText = nonTagText + (nonTagText ? '\n\n' : '') + tags.join(' ');
+                    tagInput.value = newText.trim();
+                    
+                    // 显示删除提示
+                    showAlert(`已删除标签: ${deletedTag}`, 'info');
+                    
+                    // 重新统计
+                    countTags(false);
+                }
+            }
+            
+            // 撤回删除函数
+            function undoDelete() {
+                if (historyIndex > 0) {
+                    // 获取上一个历史记录
+                    historyIndex--;
+                    const prevTags = tagsHistory[historyIndex];
+                    
+                    // 获取当前非标签文本
+                    const currentText = tagInput.value;
+                    const tagRegex = /#[^\s#]+/g;
+                    const nonTagText = currentText.replace(tagRegex, '').trim();
+                    
+                    // 使用历史记录中的标签重建文本
+                    const newText = nonTagText + (nonTagText ? '\n\n' : '') + prevTags.join(' ');
+                    tagInput.value = newText.trim();
+                    
+                    // 重新统计
+                    countTags(false);
+                    
+                    // 显示撤回提示
+                    showAlert('已撤回上一步删除操作', 'success');
+                    
+                    // 更新撤回按钮状态
+                    updateUndoButton();
+                }
+            }
+            
+            // 清空函数
+            function clearAll() {
+                tagInput.value = '';
+                tagsContainer.innerHTML = '<p style="color: #95a5a6; text-align: center; margin-top: 50px;">统计结果将在这里显示</p>';
+                totalTagsElement.textContent = '0';
+                exceededCountElement.textContent = '0';
+                exceededCountElement.classList.remove('exceeded');
+                limitInput.value = '50';
+                limitDisplay.textContent = '50';
+                
+                // 清空历史记录
+                tagsHistory = [];
+                historyIndex = -1;
+                updateUndoButton();
+                
+                // 清空所有提示
+                clipboardAlerts.innerHTML = '';
+            }
+            
+            // 事件监听
+            countBtn.addEventListener('click', () => countTags(true));
+            clearBtn.addEventListener('click', clearAll);
+            undoBtn.addEventListener('click', undoDelete);
+            
+            // 限制输入框变化时更新显示
+            limitInput.addEventListener('change', function() {
+                const value = parseInt(this.value);
+                if (isNaN(value) || value < 1) {
+                    this.value = 1;
+                } else if (value > 200) {
+                    this.value = 200;
+                }
+                limitDisplay.textContent = this.value;
+                countTags(false); // 限制改变时重新统计
+            });
+            
+            // 实时统计（防抖处理）
+            let debounceTimer;
+            tagInput.addEventListener('input', function() {
+                clearTimeout(debounceTimer);
+                debounceTimer = setTimeout(() => countTags(true), 800);
+            });
+            
+            // 页面加载时自动读取剪切板
+            autoReadClipboard();
+            
+            // 页面加载时自动统计（如果有内容）
+            setTimeout(() => {
+                if (tagInput.value && tagInput.value.trim().length > 0) {
+                    countTags(true);
+                }
+            }, 1500);
+        });
+    </script>
+</body>
+</html>
