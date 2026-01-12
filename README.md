@@ -1,4 +1,4 @@
-📊 标签数量统计器
+<p align="center"> <strong>📊 标签数量统计器</strong> </p><p align="center">
 <p align="center"> <strong>智能识别、统计并管理社交媒体标签的在线工具</strong> </p><p align="center"> </p><p align="center"> <img src="https://img.shields.io/badge/HTML5-E34F26?style=flat&logo=html5&logoColor=white" alt="HTML5"> <img src="https://img.shields.io/badge/CSS3-1572B6?style=flat&logo=css3&logoColor=white" alt="CSS3"> <img src="https://img.shields.io/badge/JavaScript-F7DF1E?style=flat&logo=javascript&logoColor=black" alt="JavaScript"> <img src="https://img.shields.io/badge/响应式设计-0088CC?style=flat" alt="响应式"> <img src="https://img.shields.io/badge/剪切板API-4CAF50?style=flat" alt="剪切板API"> </p>
 
 🌟 功能特性：
